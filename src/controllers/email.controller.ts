@@ -12,7 +12,7 @@ export class EmailController {
 
 	/**
 	 * GET /api/mailboxes
-	 * Lists all mailboxes and message counts.
+	 * Lists all mailboxes and message counts (Admin only).
 	 */
 	async listMailboxes(c: Context<AppEnv>): Promise<Response> {
 		const mailboxes = await this.emailService.listMailboxes();
@@ -21,7 +21,7 @@ export class EmailController {
 
 	/**
 	 * GET /api/emails?mailbox=<name>&limit=<limit>&offset=<offset>
-	 * Lists emails in a specific mailbox.
+	 * Lists emails in a specific mailbox (Admin or authorized mailbox token).
 	 */
 	async getEmails(c: Context<AppEnv>): Promise<Response> {
 		const mailbox = c.req.query('mailbox');
@@ -52,17 +52,28 @@ export class EmailController {
 
 	/**
 	 * GET /api/emails/:id
-	 * Retrieves a single email by ID.
+	 * Retrieves a single email by ID (Admin or authorized mailbox owner).
 	 */
 	async getEmailById(c: Context<AppEnv>): Promise<Response> {
 		const id = c.req.param('id');
 		if (!id) {
 			return c.json({ success: false, error: 'Missing email ID' }, 400);
 		}
-		const email = await this.emailService.getEmailById(id);
 
+		const email = await this.emailService.getEmailById(id);
 		if (!email) {
 			return c.json({ success: false, error: 'Email not found' }, 404);
+		}
+
+		const user = c.get('authUser');
+		if (user && user.role !== 'admin' && user.mailbox?.toLowerCase() !== email.mailbox.toLowerCase()) {
+			return c.json(
+				{
+					success: false,
+					error: 'Forbidden: Access to this email is denied.',
+				},
+				403,
+			);
 		}
 
 		return c.json({ success: true, email });
@@ -70,7 +81,7 @@ export class EmailController {
 
 	/**
 	 * DELETE /api/emails?mailbox=<name>
-	 * Bulk deletes all emails in a mailbox.
+	 * Bulk deletes all emails in a mailbox (Admin or authorized mailbox owner).
 	 */
 	async deleteEmails(c: Context<AppEnv>): Promise<Response> {
 		const mailbox = c.req.query('mailbox');
@@ -94,15 +105,32 @@ export class EmailController {
 
 	/**
 	 * DELETE /api/emails/:id
-	 * Deletes a single email by ID.
+	 * Deletes a single email by ID (Admin or authorized mailbox owner).
 	 */
 	async deleteEmailById(c: Context<AppEnv>): Promise<Response> {
 		const id = c.req.param('id');
 		if (!id) {
 			return c.json({ success: false, error: 'Missing email ID' }, 400);
 		}
-		const deleted = await this.emailService.deleteEmailById(id);
 
+		const user = c.get('authUser');
+		if (user && user.role !== 'admin') {
+			const email = await this.emailService.getEmailById(id);
+			if (!email) {
+				return c.json({ success: false, error: 'Email not found' }, 404);
+			}
+			if (user.mailbox?.toLowerCase() !== email.mailbox.toLowerCase()) {
+				return c.json(
+					{
+						success: false,
+						error: 'Forbidden: Access to this email is denied.',
+					},
+					403,
+				);
+			}
+		}
+
+		const deleted = await this.emailService.deleteEmailById(id);
 		return c.json({ success: deleted, deletedId: id });
 	}
 }
