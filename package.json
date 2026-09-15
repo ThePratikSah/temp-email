@@ -6,14 +6,22 @@
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
     "start": "wrangler dev",
-    "test": "vitest",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "migrate:local": "wrangler d1 migrations apply temp-email-db --local",
+    "migrate:remote": "wrangler d1 migrations apply temp-email-db --remote",
+    "db:list": "wrangler d1 migrations list temp-email-db"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.0.0",
     "@types/node": "^26.5.1",
     "typescript": "^5.5.2",
-    "vitest": "~4.1.0",
     "wrangler": "^4.131.2"
+  },
+  "dependencies": {
+    "postal-mime": "^3.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "workerd@1.20260911.1": true
   }
 }
