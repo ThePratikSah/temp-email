@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { EmailController } from '../controllers/email.controller';
+import { EmailController } from '../controllers';
 import { requireAdmin, requireAuth, requireMailboxAccess } from '../middleware/auth.middleware';
 import type { AppEnv } from '../types/env';
 
