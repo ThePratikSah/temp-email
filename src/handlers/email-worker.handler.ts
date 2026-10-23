@@ -11,13 +11,21 @@ import type { AttachmentMeta } from '../types/email';
  */
 export async function handleIncomingEmail(message: ForwardableEmailMessage, env: Env, _ctx: ExecutionContext): Promise<void> {
 	try {
-		// 1. Envelope & Mailbox Extraction
+		// 0. Envelope & Mailbox Extraction
 		const recipient = message.to.trim().toLowerCase();
 		const [rawMailbox, domain = ''] = recipient.split('@');
 		const mailbox = rawMailbox || 'default';
 		const sender = message.from.trim().toLowerCase();
 
+		// 1. DB
+		const emailRepo = new D1EmailRepository(env.DB);
+		const emailService = new EmailService(emailRepo);
+
 		console.log(`[Email] Received for ${recipient} (mailbox: ${mailbox}) from ${sender}`);
+		if (!await emailService.mailboxExists(mailbox)) { // check if the mailbox exists or deleted
+			console.error('[Email] Email processing failed as mailbox was deleted');
+			message.setReject('Internal processing error');
+		}
 
 		// 2. Parse MIME structure using PostalMime
 		const email = await PostalMime.parse(message.raw);
@@ -49,9 +57,6 @@ export async function handleIncomingEmail(message: ForwardableEmailMessage, env:
 		});
 
 		// 5. Persist via EmailService
-		const emailRepo = new D1EmailRepository(env.DB);
-		const emailService = new EmailService(emailRepo);
-
 		const id = crypto.randomUUID();
 		await emailService.saveEmail({
 			id,
