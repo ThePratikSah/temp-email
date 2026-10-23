@@ -82,7 +82,7 @@ export class EmailService implements IEmailService {
 		return Math.floor(offset);
 	}
 
-	mailboxExists(mailbox: string): Promise<BlockedMailbox | null> {
+	checkMailboxDeleted(mailbox: string): Promise<BlockedMailbox | null> {
 		return this.emailRepo.findDeletedMailbox(mailbox);
 	}
 }

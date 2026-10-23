@@ -22,7 +22,7 @@ export async function handleIncomingEmail(message: ForwardableEmailMessage, env:
 		const emailService = new EmailService(emailRepo);
 
 		console.log(`[Email] Received for ${recipient} (mailbox: ${mailbox}) from ${sender}`);
-		if (!await emailService.mailboxExists(mailbox)) { // check if the mailbox exists or deleted
+		if (await emailService.checkMailboxDeleted(mailbox)) { // check if the mailbox exists or deleted
 			console.error('[Email] Email processing failed as mailbox was deleted');
 			message.setReject('Internal processing error');
 			return;
