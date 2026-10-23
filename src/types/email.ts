@@ -33,6 +33,11 @@ export interface MailboxSummary {
 	last_received: string;
 }
 
+export interface BlockedMailbox {
+	mailbox: string;
+	blocked_at: string;
+}
+
 export interface CreateEmailDTO {
 	id: string;
 	mailbox: string;
