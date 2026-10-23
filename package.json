@@ -14,15 +14,15 @@
   "devDependencies": {
     "@types/node": "^26.6.2",
     "typescript": "^5.9.3",
-    "wrangler": "^4.136.0"
+    "wrangler": "^4.152.0"
   },
   "dependencies": {
     "hono": "^4.13.8",
     "postal-mime": "^3.0.0"
   },
   "allowScripts": {
-    "esbuild@0.28.1": true,
     "fsevents@2.3.3": true,
-    "workerd@1.20260921.1": true
+    "esbuild@0.28.2": true,
+    "workerd@1.20261019.1": true
   }
 }
