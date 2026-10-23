@@ -1,4 +1,4 @@
-import type { CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
+import type { BlockedMailbox, CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
 
 /**
  * Contract for Email domain business logic.
@@ -11,4 +11,5 @@ export interface IEmailService {
 	deleteEmailsByMailbox(mailbox: string): Promise<number>;
 	deleteEmailById(id: string): Promise<boolean>;
 	saveEmail(input: CreateEmailDTO): Promise<void>;
+	mailboxExists(mailbox: string): Promise<BlockedMailbox | null>;
 }

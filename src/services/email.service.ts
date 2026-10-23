@@ -1,5 +1,5 @@
 import type { IEmailRepository } from '../repositories/email.repository.interface';
-import type { CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
+import type { BlockedMailbox, CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
 import type { IEmailService } from './email.service.interface';
 
 /**
@@ -12,7 +12,7 @@ export class EmailService implements IEmailService {
 	private static readonly DEFAULT_LIMIT = 50;
 	private static readonly MAX_LIMIT = 100;
 
-	constructor(private readonly emailRepo: IEmailRepository) {}
+	constructor(private readonly emailRepo: IEmailRepository) { }
 
 	async listMailboxes(): Promise<MailboxSummary[]> {
 		return await this.emailRepo.listMailboxes();
@@ -80,5 +80,9 @@ export class EmailService implements IEmailService {
 			return 0;
 		}
 		return Math.floor(offset);
+	}
+
+	mailboxExists(mailbox: string): Promise<BlockedMailbox | null> {
+		return this.emailRepo.findDeletedMailbox(mailbox);
 	}
 }

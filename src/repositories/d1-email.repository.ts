@@ -1,4 +1,4 @@
-import type { CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
+import type { BlockedMailbox, CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
 import type { IEmailRepository } from './email.repository.interface';
 
 /**
@@ -6,7 +6,12 @@ import type { IEmailRepository } from './email.repository.interface';
  * Follows Single Responsibility Principle (only responsible for D1 persistence operations).
  */
 export class D1EmailRepository implements IEmailRepository {
-	constructor(private readonly db: D1Database) {}
+	constructor(private readonly db: D1Database) { }
+	async findDeletedMailbox(mailbox: string): Promise<BlockedMailbox | null> {
+		return await this.db.prepare(`SELECT * FROM blocked_mailboxes WHERE mailbox = ?`)
+			.bind(mailbox.toLowerCase())
+			.first<BlockedMailbox>();
+	}
 
 	async save(input: CreateEmailDTO): Promise<void> {
 		const receivedAt = input.receivedAt || new Date().toISOString();
