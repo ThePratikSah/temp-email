@@ -25,6 +25,7 @@ export async function handleIncomingEmail(message: ForwardableEmailMessage, env:
 		if (!await emailService.mailboxExists(mailbox)) { // check if the mailbox exists or deleted
 			console.error('[Email] Email processing failed as mailbox was deleted');
 			message.setReject('Internal processing error');
+			return;
 		}
 
 		// 2. Parse MIME structure using PostalMime
