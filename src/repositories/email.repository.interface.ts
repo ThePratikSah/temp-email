@@ -1,4 +1,4 @@
-import type { CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
+import type { BlockedMailbox, CreateEmailDTO, EmailRecord, MailboxSummary } from '../types/email';
 
 /**
  * Segregated interface for email query operations (Interface Segregation Principle).
@@ -19,6 +19,13 @@ export interface IEmailWriter {
 }
 
 /**
+ * Segregated interface for deleted mailbox operatoins
+ */
+export interface IDeletedMailbox {
+	findDeletedMailbox(mailbox: string): Promise<BlockedMailbox | null>;
+}
+
+/**
  * Full email repository interface combining read and write operations.
  */
-export interface IEmailRepository extends IEmailReader, IEmailWriter {}
+export interface IEmailRepository extends IEmailReader, IEmailWriter, IDeletedMailbox { }
